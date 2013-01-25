@@ -6,6 +6,6 @@
 	<classpathentry kind="lib" path="libs/xml-apis.jar"/>
 	<classpathentry kind="lib" path="libs/resolver.jar"/>
 	<classpathentry kind="lib" path="libs/serializer.jar"/>
-	<classpathentry kind="lib" path="libs/xercesSamples.jar"/>
+	<classpathentry kind="lib" path="libs/xercesSamples.jar" sourcepath="samples"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
