@@ -3,19 +3,15 @@ package com.andrewshu.layout2deelang;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Locale;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.ParserAdapter;
-import org.xml.sax.helpers.ParserFactory;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import sax.DocumentTracer;
@@ -25,10 +21,11 @@ public class Layout2Deelang extends DocumentTracer {
 	private Writer output;
 	private int elementCount;
 	
-	private boolean printedBlankLine;
+	private boolean allowBlankLine;
 
 	@Override
 	public void startDocument() throws SAXException {
+		allowBlankLine = false;
 	}
 
 	@Override
@@ -52,42 +49,49 @@ public class Layout2Deelang extends DocumentTracer {
 
 		elementCount++;
 		
-		if (Elements.TEXT_VIEW.equals(localName)) {
-			String elementName = getElementName(attributes);
+		boolean needsIndent;
+		
+		String elementName = getElementName(attributes);
+		if (Elements.VIEW.equals(localName)) {
+			printDeelang(String.format(Locale.ENGLISH, "%s = addView(%d)", elementName, elementCount));
+			needsIndent = false;
+		}
+		else if (Elements.TEXT_VIEW.equals(localName)) {
 			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(%d)", elementName, elementCount));
+			needsIndent = false;
 		}
 		else if (Elements.IMAGE_VIEW.equals(localName)) {
-			String elementName = getElementName(attributes);
 			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(%d)", elementName, elementCount));
+			needsIndent = false;
 		}
 		else if (Elements.PROGRESS_BAR.equals(localName)) {
-			String elementName = getElementName(attributes);
 			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(%d)", elementName, elementCount));
+			needsIndent = false;
 		}
 		else if (Elements.FRAME_LAYOUT.equals(localName)) {
-			String elementName = getElementName(attributes);
-			
 			printDeelang("");
 			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(%d)", elementName, elementCount));
-
-			fIndent++;
+			needsIndent = true;
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
-			String elementName = getElementName(attributes);
-			
 			printDeelang("");
 			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(%d)", elementName, elementCount));
-			
-			fIndent++;
+			needsIndent = true;
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
-			String elementName = getElementName(attributes);
-			
 			printDeelang("");
 			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(%d)", elementName, elementCount));
-			
-			fIndent++;
+			needsIndent = true;
 		}
+		else {
+			throw new IllegalStateException("startElement: unhandled element name: " + localName);
+		}
+		
+		printUnsupportedAttributesDeelang(attributes);
+		printAttributesDeelang(elementName, attributes);
+		
+		if (needsIndent)
+			fIndent++;
 	}
 	
 	private String getElementName(Attributes attributes) {
@@ -172,13 +176,13 @@ public class Layout2Deelang extends DocumentTracer {
 			
 			if ("".equals(line)) {
 				// disallow printing multiple blank lines in a row. for style reasons only.
-				if (printedBlankLine)
+				if (!allowBlankLine)
 					return;
 				
-				printedBlankLine = true;
+				allowBlankLine = false;
 			}
 			else {
-				printedBlankLine = false;
+				allowBlankLine = true;
 				
 				// Deelang compiler chokes on whitespace-only lines
 				for (int i = 0; i < fIndent; i++)
@@ -193,6 +197,173 @@ public class Layout2Deelang extends DocumentTracer {
 	}
 	
 	/**
+	 * Print attributes currently unsupported by layout2deelang.
+	 */
+	protected void printUnsupportedAttributesDeelang(Attributes attributes) {
+		int length = attributes.getLength();
+		for (int i = 0; i < length; i++) {
+			String qname = attributes.getQName(i);
+			String value = attributes.getValue(qname);
+			if (!AndroidAttributes.supported.contains(qname) && !AndroidAttributes.supportedByValue.contains(String.format(Locale.ENGLISH, "%s=\"%s\"", qname, value))) {
+				printDeelang(String.format(Locale.ENGLISH, "// NOT CURRENTLY SUPPORTED: %s=\"%s\"", qname, attributes.getValue(qname)));
+			}
+		}
+	}
+	
+	/**
+	 * Print attributes associated with the View element.
+	 */
+	protected void printAttributesDeelang(String viewName, Attributes attributes) {
+		//
+		// View
+		//
+		
+		// layout_width and layout_height are required; assume present
+		String layout_width = attributes.getValue("android:layout_width");
+		String layout_height = attributes.getValue("android:layout_height");
+		printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutSize(\"%s\", \"%s\")", viewName, layout_width, layout_height));
+		
+		// layout_weight
+		String layout_weight = attributes.getValue("android:layout_weight");
+		if (layout_weight != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutWeight(%f)", viewName, Float.parseFloat(layout_weight)));
+		
+		// layout_gravity
+		String layout_gravity = attributes.getValue("android:layout_gravity");
+		if (layout_gravity != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutGravity(\"%s\")", viewName, layout_gravity));
+		
+		// layout_margin*
+		String layout_margin = attributes.getValue("android:layout_margin");
+		if (layout_margin != null) {
+			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMargin(\"%s\")", viewName, layout_margin));
+		}
+		else {
+			String layout_marginLeft   = attributes.getValue("android:layout_marginLeft");
+			String layout_marginTop    = attributes.getValue("android:layout_marginTop");
+			String layout_marginRight  = attributes.getValue("android:layout_marginRight");
+			String layout_marginBottom = attributes.getValue("android:layout_marginBottom");
+			if (layout_marginLeft != null && layout_marginTop != null && layout_marginRight != null && layout_marginBottom != null) {
+				printDeelang(String.format(
+						Locale.ENGLISH, "%s.setLayoutMargins(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, layout_marginLeft, layout_marginTop, layout_marginRight, layout_marginBottom
+				));
+			}
+			else {
+				if (layout_marginLeft != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginLeft(\"%s\")", viewName, layout_marginLeft));
+				if (layout_marginTop != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginTop(\"%s\")", viewName, layout_marginTop));
+				if (layout_marginRight != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginRight(\"%s\")", viewName, layout_marginRight));
+				if (layout_marginBottom != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginBottom(\"%s\")", viewName, layout_marginBottom));
+			}
+		}
+		
+		// orientation
+		String orientation = attributes.getValue("android:orientation");
+		if (orientation != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setOrientation(\"%s\")", viewName, orientation));
+		
+		// minWidth and minHeight
+		String minWidth  = attributes.getValue("android:minWidth");
+		String minHeight = attributes.getValue("android:minHeight");
+		if (minWidth != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setMinWidth(\"%s\")", viewName, minWidth));
+		if (minHeight != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setMinHeight(\"%s\")", viewName, minHeight));
+		
+		// descendantFocusability
+		String descendantFocusability = attributes.getValue("android:descendantFocusability");
+		if (descendantFocusability != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setDescendantFocusability(\"%s\")", viewName, descendantFocusability));
+
+		// background
+//		String background
+		
+		// padding -- NOTE: must come after background!
+		String padding = attributes.getValue("android:padding");
+		if (padding != null) {
+			printDeelang(String.format(Locale.ENGLISH, "%s.setPadding(\"%s\")", viewName, padding));
+		}
+		else {
+			String paddingLeft   = attributes.getValue("android:paddingLeft");
+			String paddingTop    = attributes.getValue("android:paddingTop");
+			String paddingRight  = attributes.getValue("android:paddingRight");
+			String paddingBottom = attributes.getValue("android:paddingBottom");
+			if (paddingLeft != null && paddingTop != null && paddingRight != null && paddingBottom != null) {
+				printDeelang(String.format(
+						Locale.ENGLISH, "%s.setPadding(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, paddingLeft, paddingTop, paddingRight, paddingBottom
+				));
+			}
+			else {
+				if (paddingLeft != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingLeft(\"%s\")", viewName, paddingLeft));
+				if (paddingTop != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingTop(\"%s\")", viewName, paddingTop));
+				if (paddingRight != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingRight(\"%s\")", viewName, paddingRight));
+				if (paddingBottom != null)
+					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingBottom(\"%s\")", viewName, paddingBottom));
+			}
+		}
+		
+		// visibility
+		String visibility = attributes.getValue("android:visibility");
+		if (visibility != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setVisibility(\"%s\")", viewName, visibility));
+		
+		//
+		// TextView
+		//
+		
+		// TextView: gravity
+		String gravity = attributes.getValue("android:gravity");
+		if (gravity != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setGravity(\"%s\")", viewName, gravity));
+		
+		// TextView: text
+		String text = attributes.getValue("android:text");
+		if (text != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setText(\"%s\")", viewName, gravity));
+		
+		// TextView: textAppearance
+		String textAppearance = attributes.getValue("android:textAppearance");
+		if ("?android:attr/textAppearanceSmall".equals(textAppearance)) {
+			printDeelang(viewName + ".setTextSize(TEXT_SIZE_SMALL)");
+			printDeelang(viewName + ".setTextColor(TEXT_COLOR_SECONDARY)");
+		}
+		else if ("?android:attr/textAppearanceMedium".equals(textAppearance)) {
+			printDeelang(viewName + ".setTextSize(TEXT_SIZE_MEDIUM)");
+		}
+		else if ("?android:attr/textAppearanceLarge".equals(textAppearance)) {
+			printDeelang(viewName + ".setTextSize(TEXT_SIZE_LARGE)");
+		}
+		
+		// TextView: textColor
+		String textColor = attributes.getValue("android:textColor");
+		if (textColor != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setTextColor(\"%s\")", viewName, textColor));
+		
+		// TextView: textStyle
+		String textStyle = attributes.getValue("android:textStyle");
+		if (textStyle != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setTextStyle(\"%s\")", viewName, textStyle));
+		
+		// TextView: textSize
+		String textSize = attributes.getValue("android:textSize");
+		if (textSize != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setTextSize(\"%s\")", viewName, textSize));
+		
+		// TextView: singleLine
+		String singleLine = attributes.getValue("android:singleLine");
+		if ("true".equals(singleLine))
+			printDeelang(viewName + ".setSingleLine()");
+			
+		// printDeelang(String.format(Locale.ENGLISH, "%s.set???(\"%s\")", viewName, ???));
+	}
+	
+	/**
 	 * main. see DocumentTracer sample
 	 */
 	public static void main(String[] argv) throws Exception {
@@ -204,7 +375,6 @@ public class Layout2Deelang extends DocumentTracer {
 
         // variables
         DocumentTracer tracer = new Layout2Deelang();
-        PrintWriter out = new PrintWriter(System.out);
         XMLReader parser = null;
         boolean namespaces = DEFAULT_NAMESPACES;
         boolean namespacePrefixes = DEFAULT_NAMESPACE_PREFIXES;
@@ -236,15 +406,8 @@ public class Layout2Deelang extends DocumentTracer {
                         parser = XMLReaderFactory.createXMLReader(parserName);
                     }
                     catch (Exception e) {
-                        try {
-                            Parser sax1Parser = ParserFactory.makeParser(parserName);
-                            parser = new ParserAdapter(sax1Parser);
-                            System.err.println("warning: Features and properties not supported on SAX1 parsers.");
-                        }
-                        catch (Exception ex) {
-                            parser = null;
-                            System.err.println("error: Unable to instantiate parser ("+parserName+")");
-                        }
+                        parser = null;
+                        System.err.println("error: Unable to instantiate parser ("+parserName+")");
                     }
                     continue;
                 }
@@ -433,9 +596,6 @@ public class Layout2Deelang extends DocumentTracer {
                 catch (SAXException e) {
                     e.printStackTrace(System.err);
                 }
-            }
-            else {
-                ((Parser)parser).setDocumentHandler(tracer);
             }
 
             // parse file
