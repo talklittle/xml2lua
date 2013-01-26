@@ -18,6 +18,8 @@ import sax.DocumentTracer;
 
 public class Layout2Deelang extends DocumentTracer {
 
+	private static String inputFileBasename;
+	
 	private Writer output;
 	private int elementCount;
 	
@@ -171,7 +173,7 @@ public class Layout2Deelang extends DocumentTracer {
 	protected void printDeelang(String line) {
 		try {
 			if (output == null) {
-				output = new FileWriter(new File("layout_" + System.currentTimeMillis() + ".dl"));
+				output = new FileWriter(new File(inputFileBasename + "." + System.currentTimeMillis() + ".dl"));
 			}
 			
 			if ("".equals(line)) {
@@ -598,6 +600,14 @@ public class Layout2Deelang extends DocumentTracer {
                 }
             }
 
+            // get file basename
+            if (arg.contains("\\"))
+            	inputFileBasename = arg.substring(arg.lastIndexOf('\\') + 1);
+            else if (arg.contains("/"))
+            	inputFileBasename = arg.substring(arg.lastIndexOf('/') + 1);
+            else
+            	inputFileBasename = arg;
+            
             // parse file
             try {
                 parser.parse(arg);
