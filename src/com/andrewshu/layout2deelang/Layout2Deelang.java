@@ -51,36 +51,36 @@ public class Layout2Deelang extends DocumentTracer {
 		
 		boolean needsIndent;
 		
-		String elementName = getElementName(attributes);
+		String viewName = getViewName(attributes);
 		if (Elements.VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addView(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addView(%d)", viewName, elementCount));
 			needsIndent = false;
 		}
 		else if (Elements.TEXT_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(%d)", viewName, elementCount));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(%d)", viewName, elementCount));
 			needsIndent = false;
 		}
 		else if (Elements.PROGRESS_BAR.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(%d)", viewName, elementCount));
 			needsIndent = false;
 		}
 		else if (Elements.FRAME_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(%d)", viewName, elementCount));
 			needsIndent = true;
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(%d)", viewName, elementCount));
 			needsIndent = true;
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(%d)", elementName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(%d)", viewName, elementCount));
 			needsIndent = true;
 		}
 		else {
@@ -88,13 +88,13 @@ public class Layout2Deelang extends DocumentTracer {
 		}
 		
 		printUnsupportedAttributesDeelang(attributes);
-		printAttributesDeelang(elementName, attributes);
+		printAttributesDeelang(viewName, attributes);
 		
 		if (needsIndent)
 			fIndent++;
 	}
 	
-	private String getElementName(Attributes attributes) {
+	private String getViewName(Attributes attributes) {
 		int length = attributes.getLength();
 		for (int i = 0; i < length; i++) {
 			String namedId = parseId(attributes.getValue("android:id"));
