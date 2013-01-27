@@ -10,6 +10,7 @@ public class Elements {
 	static String PROGRESS_BAR = "ProgressBar";
 	
 	static String FRAME_LAYOUT = "FrameLayout";
+	static String DONT_PRESS_WITH_PARENT_FRAME_LAYOUT = "com.andrewshu.android.reddit.layout.DontPressWithParentFrameLayout";
 	static String LINEAR_LAYOUT = "LinearLayout";
 	static String RELATIVE_LAYOUT = "RelativeLayout";
 	
@@ -20,6 +21,7 @@ public class Elements {
 		supported.add(IMAGE_VIEW);
 		supported.add(PROGRESS_BAR);
 		supported.add(FRAME_LAYOUT);
+		supported.add(DONT_PRESS_WITH_PARENT_FRAME_LAYOUT);
 		supported.add(LINEAR_LAYOUT);
 		supported.add(RELATIVE_LAYOUT);
 	}

@@ -27,6 +27,7 @@ public class AndroidAttributes {
 		supported.add("android:paddingRight");
 		supported.add("android:paddingBottom");
 		supported.add("android:visibility");
+		supported.add("android:onClick");
 		
 		supported.add("android:text");
 		supported.add("android:textColor");

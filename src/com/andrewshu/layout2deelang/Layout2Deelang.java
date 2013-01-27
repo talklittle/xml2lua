@@ -54,35 +54,39 @@ public class Layout2Deelang extends DocumentTracer {
 		boolean needsIndent;
 		
 		String viewName = getViewName(attributes);
+		String id = parseId(attributes.getValue("android:id"));
+		if (id == null)
+			id = viewName;
+		
 		if (Elements.VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addView(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.TEXT_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.PROGRESS_BAR.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
-		else if (Elements.FRAME_LAYOUT.equals(localName)) {
+		else if (Elements.FRAME_LAYOUT.equals(localName) || Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
 			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(%d)", viewName, elementCount));
+			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else {
@@ -121,6 +125,11 @@ public class Layout2Deelang extends DocumentTracer {
 		}
 		
 		if (Elements.FRAME_LAYOUT.equals(localName)) {
+			fIndent--;
+			printDeelang("end()");
+			printDeelang("");
+		}
+		else if (Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
 			fIndent--;
 			printDeelang("end()");
 			printDeelang("");
@@ -300,15 +309,19 @@ public class Layout2Deelang extends DocumentTracer {
 		// background
 		String background = attributes.getValue("android:background");
 		if (background != null) {
-			printFixmeIfNeededDeelang(background);
-			if (background.startsWith("@drawable/"))
-				printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundDrawable(\"%s\")", viewName, background));
-			if (background.startsWith("@color/"))
-				printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundColor(\"%s\")", viewName, background));
-				
+			if ("?attr/actionBarItemBackground".equals(background)) {
+				printDeelang(viewName + ".setBackgroundDrawable(getSelectableItemBackground())");
+			}
+			else {
+				printFixmeIfNeededDeelang(background);
+				if (background.startsWith("@drawable/") || background.endsWith(".png") || background.endsWith(".xml"))
+					printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundDrawable(\"%s\")", viewName, background));
+				else if (background.startsWith("@color/") || background.startsWith("#"))
+					printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundColor(\"%s\")", viewName, background));
+			}
 		}
 		
-		// padding -- NOTE: must come after background!
+		// padding -- NOTE: must come after background! // http://stackoverflow.com/questions/10392688/android-listview-row-layout-ignoring-padding
 		String padding = attributes.getValue("android:padding");
 		if (padding != null) {
 			printFixmeIfNeededDeelang(padding);
@@ -349,6 +362,12 @@ public class Layout2Deelang extends DocumentTracer {
 		printFixmeIfNeededDeelang(visibility);
 		if (visibility != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setVisibility(\"%s\")", viewName, visibility));
+		
+		// onClick
+		String onClick = attributes.getValue("android:onClick");
+		//printFixmeIfNeededDeelang(visibility);
+		if (onClick != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setOnClick(\"%s\")", viewName, onClick));
 		
 		//
 		// TextView
