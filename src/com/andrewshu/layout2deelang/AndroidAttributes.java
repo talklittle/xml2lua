@@ -20,6 +20,7 @@ public class AndroidAttributes {
 		supported.add("android:minWidth");
 		supported.add("android:minHeight");
 		supported.add("android:descendantFocusability");
+		supported.add("android:background");
 		supported.add("android:padding");
 		supported.add("android:paddingLeft");
 		supported.add("android:paddingTop");
