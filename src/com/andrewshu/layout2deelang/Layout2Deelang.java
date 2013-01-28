@@ -503,6 +503,12 @@ public class Layout2Deelang extends DocumentTracer {
 		if (src != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setDrawable(\"%s\")", viewName, src));
 			
+		// ImageView: contentDescription
+		String contentDescription = attributes.getValue("android:contentDescription");
+		printFixmeIfNeededDeelang(contentDescription);
+		if (contentDescription != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setContentDescription(\"%s\")", viewName, contentDescription));
+		
 		// printDeelang(String.format(Locale.ENGLISH, "%s.set???(\"%s\")", viewName, ???));
 	}
 	

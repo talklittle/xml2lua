@@ -29,6 +29,8 @@ public class AndroidAttributes {
 		supported.add("android:visibility");
 		supported.add("android:onClick");
 		
+		// TextView
+		
 		supported.add("android:text");
 		supported.add("android:textColor");
 		supported.add("android:textSize");
@@ -37,7 +39,10 @@ public class AndroidAttributes {
 		supported.add("android:singleLine");
 		supported.add("android:ellipsize");
 		
+		// ImageView
+		
 		supported.add("android:src");
+		supported.add("android:contentDescription");
 	}
 	
 	static final HashSet<String> supportedByValue = new HashSet<String>();
