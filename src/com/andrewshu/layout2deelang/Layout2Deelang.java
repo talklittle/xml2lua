@@ -75,6 +75,14 @@ public class Layout2Deelang extends DocumentTracer {
 			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
+		else if (Elements.BUTTON.equals(localName)) {
+			printDeelang(String.format(Locale.ENGLISH, "%s = addButton(\"%s\")", viewName, id));
+			needsIndent = false;
+		}
+		else if (Elements.IMAGE_BUTTON.equals(localName)) {
+			printDeelang(String.format(Locale.ENGLISH, "%s = addImageButton(\"%s\")", viewName, id));
+			needsIndent = false;
+		}
 		else if (Elements.FRAME_LAYOUT.equals(localName) || Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
 			printDeelang("");
 			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(\"%s\")", viewName, id));
