@@ -476,6 +476,16 @@ public class Layout2Deelang extends DocumentTracer {
 		printFixmeIfNeededDeelang(singleLine);
 		if (singleLine != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setSingleLine(\"%s\")", viewName, singleLine));
+		
+		//
+		// ImageView
+		//
+		
+		// src
+		String src = attributes.getValue("android:src");
+		printFixmeIfNeededDeelang(src);
+		if (src != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setDrawable(\"%s\")", viewName, src));
 			
 		// printDeelang(String.format(Locale.ENGLISH, "%s.set???(\"%s\")", viewName, ???));
 	}
