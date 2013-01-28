@@ -46,6 +46,7 @@ public class Layout2Deelang extends DocumentTracer {
 	public void startElement(String uri, String localName, String qname, Attributes attributes) throws SAXException {
 		if (!Elements.supported.contains(localName)) {
 			System.err.println("startElement: Unsupported element: " + localName);
+			printUnsupportedElementDeelang(localName, attributes);
 			return;
 		}
 
@@ -115,6 +116,51 @@ public class Layout2Deelang extends DocumentTracer {
 			return id.substring(id.indexOf('/') + 1);  // "@+id/SOME_NAME"
 		}
 		return null;
+	}
+	
+	private void printUnsupportedElementDeelang(String localName, Attributes attributes) {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("// UNSUPPORTED ELEMENT: ").append(localName).append("; ");
+		
+		builder.append("attributes=");
+        if (attributes == null) {
+        	builder.append("null");
+        }
+        else {
+        	builder.append('{');
+            int length = attributes.getLength();
+            for (int i = 0; i < length; i++) {
+                if (i > 0) {
+                	builder.append(',');
+                }
+//                String attrLocalName = attributes.getLocalName(i);
+                String attrQName = attributes.getQName(i);
+//                String attrURI = attributes.getURI(i);
+//                String attrType = attributes.getType(i);
+                String attrValue = attributes.getValue(i);
+                builder.append('{');
+//                builder.append("uri=\"");
+//                builder.append(attrURI);
+//                builder.append("\",");
+//                builder.append("localName=\"");
+//                builder.append(attrLocalName);
+//                builder.append("\",");
+                builder.append("qname=\"");
+                builder.append(attrQName);
+                builder.append("\",");
+//                builder.append("type=\"");
+//                builder.append(attrType);
+//                builder.append("\",");
+                builder.append("value=\"");
+                builder.append(attrValue);
+                builder.append("\"}");
+            }
+            builder.append('}');
+        }
+        builder.append(')');
+        
+        printDeelang(builder.toString());
 	}
 
 	@Override
@@ -217,7 +263,7 @@ public class Layout2Deelang extends DocumentTracer {
 			String qname = attributes.getQName(i);
 			String value = attributes.getValue(qname);
 			if (!AndroidAttributes.supported.contains(qname) && !AndroidAttributes.supportedByValue.contains(String.format(Locale.ENGLISH, "%s=\"%s\"", qname, value))) {
-				printDeelang(String.format(Locale.ENGLISH, "// NOT CURRENTLY SUPPORTED: %s=\"%s\"", qname, attributes.getValue(qname)));
+				printDeelang(String.format(Locale.ENGLISH, "// UNSUPPORTED ATTRIBUTE: %s=\"%s\"", qname, attributes.getValue(qname)));
 			}
 		}
 	}
