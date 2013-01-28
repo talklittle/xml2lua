@@ -430,9 +430,15 @@ public class Layout2Deelang extends DocumentTracer {
 		
 		// onClick
 		String onClick = attributes.getValue("android:onClick");
-		//printFixmeIfNeededDeelang(visibility);
+		printFixmeIfNeededDeelang(onClick);
 		if (onClick != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setOnClick(\"%s\")", viewName, onClick));
+		
+		// clickable
+		String clickable = attributes.getValue("android:clickable");
+		printFixmeIfNeededDeelang(clickable);
+		if (clickable != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setClickable(\"%s\")", viewName, clickable));
 		
 		//
 		// TextView
@@ -492,6 +498,12 @@ public class Layout2Deelang extends DocumentTracer {
 		printFixmeIfNeededDeelang(ellipsize);
 		if (ellipsize != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setEllipsize(\"%s\")", viewName, ellipsize));
+		
+		// TextView: linksClickable
+		String linksClickable = attributes.getValue("android:linksClickable");
+		printFixmeIfNeededDeelang(linksClickable);
+		if (linksClickable != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setLinksClickable(\"%s\")", viewName, linksClickable));
 		
 		//
 		// ImageView

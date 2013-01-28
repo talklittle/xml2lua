@@ -28,6 +28,7 @@ public class AndroidAttributes {
 		supported.add("android:paddingBottom");
 		supported.add("android:visibility");
 		supported.add("android:onClick");
+		supported.add("android:clickable");
 		
 		// TextView
 		
@@ -38,6 +39,7 @@ public class AndroidAttributes {
 		supported.add("android:gravity");
 		supported.add("android:singleLine");
 		supported.add("android:ellipsize");
+		supported.add("android:linksClickable");
 		
 		// ImageView
 		
