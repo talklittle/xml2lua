@@ -487,11 +487,17 @@ public class Layout2Deelang extends DocumentTracer {
 		if (singleLine != null)
 			printDeelang(String.format(Locale.ENGLISH, "%s.setSingleLine(\"%s\")", viewName, singleLine));
 		
+		// TextView: ellipsize
+		String ellipsize = attributes.getValue("android:ellipsize");
+		printFixmeIfNeededDeelang(ellipsize);
+		if (ellipsize != null)
+			printDeelang(String.format(Locale.ENGLISH, "%s.setEllipsize(\"%s\")", viewName, ellipsize));
+		
 		//
 		// ImageView
 		//
 		
-		// src
+		// ImageView: src
 		String src = attributes.getValue("android:src");
 		printFixmeIfNeededDeelang(src);
 		if (src != null)

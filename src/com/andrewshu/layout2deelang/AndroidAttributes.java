@@ -35,6 +35,7 @@ public class AndroidAttributes {
 		supported.add("android:textStyle");
 		supported.add("android:gravity");
 		supported.add("android:singleLine");
+		supported.add("android:ellipsize");
 		
 		supported.add("android:src");
 	}
