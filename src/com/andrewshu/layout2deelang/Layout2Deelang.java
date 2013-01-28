@@ -182,7 +182,8 @@ public class Layout2Deelang extends DocumentTracer {
 	protected void printDeelang(String line) {
 		try {
 			if (output == null) {
-				output = new FileWriter(new File(inputFileBasename + "." + System.currentTimeMillis() + ".dl"));
+				String name = inputFileBasename.substring(0, inputFileBasename.lastIndexOf('.')) + "." + System.currentTimeMillis() + ".dl";
+				output = new FileWriter(new File(name));
 			}
 			
 			if ("".equals(line)) {
