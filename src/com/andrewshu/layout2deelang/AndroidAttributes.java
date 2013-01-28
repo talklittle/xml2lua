@@ -44,6 +44,8 @@ public class AndroidAttributes {
 		supportedByValue.add("android:textAppearance=\"?android:attr/textAppearanceSmall\"");
 		supportedByValue.add("android:textAppearance=\"?android:attr/textAppearanceMedium\"");
 		supportedByValue.add("android:textAppearance=\"?android:attr/textAppearanceLarge\"");
+		
+		supportedByValue.add("style=\"?android:attr/buttonStyleSmall\"");
 	}
 
 }

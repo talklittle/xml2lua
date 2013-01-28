@@ -76,11 +76,21 @@ public class Layout2Deelang extends DocumentTracer {
 			needsIndent = false;
 		}
 		else if (Elements.BUTTON.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addButton(\"%s\")", viewName, id));
+			String method;
+			if ("?android:attr/buttonStyleSmall".equals(attributes.getValue("style")))
+				method = "addButtonSmall";
+			else
+				method = "addButton";
+			printDeelang(String.format(Locale.ENGLISH, "%s = %s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_BUTTON.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addImageButton(\"%s\")", viewName, id));
+			String method;
+			if ("?android:attr/buttonStyleSmall".equals(attributes.getValue("style")))
+				method = "addImageButtonSmall";
+			else
+				method = "addImageButton";
+			printDeelang(String.format(Locale.ENGLISH, "%s = %s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.FRAME_LAYOUT.equals(localName) || Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
