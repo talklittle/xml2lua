@@ -68,19 +68,19 @@ public class Layout2Lua extends DocumentTracer {
 			id = viewName;
 		
 		if (Elements.VIEW.equals(localName)) {
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:addView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:addView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.TEXT_VIEW.equals(localName)) {
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:addTextView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:addTextView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_VIEW.equals(localName)) {
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:addImageView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:addImageView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.PROGRESS_BAR.equals(localName)) {
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:addProgressBar(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:addProgressBar(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.BUTTON.equals(localName)) {
@@ -89,7 +89,7 @@ public class Layout2Lua extends DocumentTracer {
 				method = "addButtonSmall";
 			else
 				method = "addButton";
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:%s(\"%s\")", viewName, method, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:%s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_BUTTON.equals(localName)) {
@@ -98,22 +98,22 @@ public class Layout2Lua extends DocumentTracer {
 				method = "addImageButtonSmall";
 			else
 				method = "addImageButton";
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:%s(\"%s\")", viewName, method, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:%s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.FRAME_LAYOUT.equals(localName) || Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
 			printLua("");
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginFrameLayout(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:beginFrameLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
 			printLua("");
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginLinearLayout(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:beginLinearLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
 			printLua("");
-			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginRelativeLayout(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "local %s = Builder:beginRelativeLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else {
