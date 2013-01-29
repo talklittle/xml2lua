@@ -510,7 +510,7 @@ public class Layout2Lua extends DocumentTracer {
 		String linksClickable = attributes.getValue("android:linksClickable");
 		printFixmeIfNeededLua(linksClickable);
 		if (linksClickable != null)
-			printLua(String.format(Locale.ENGLISH, "%s:setLinksClickable(\"%s\")", viewName, linksClickable));
+			printLua(String.format(Locale.ENGLISH, "%s:setLinksClickable(%s)", viewName, linksClickable));
 		
 		//
 		// ImageView
