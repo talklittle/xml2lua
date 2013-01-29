@@ -445,7 +445,7 @@ public class Layout2Lua extends DocumentTracer {
 		String clickable = attributes.getValue("android:clickable");
 		printFixmeIfNeededLua(clickable);
 		if (clickable != null)
-			printLua(String.format(Locale.ENGLISH, "%s:setClickable(\"%s\")", viewName, clickable));
+			printLua(String.format(Locale.ENGLISH, "%s:setClickable(%s)", viewName, clickable));
 		
 		//
 		// TextView
