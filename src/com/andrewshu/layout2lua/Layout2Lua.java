@@ -1,4 +1,4 @@
-package com.andrewshu.layout2deelang;
+package com.andrewshu.layout2lua;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,7 +16,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import sax.DocumentTracer;
 
-public class Layout2Deelang extends DocumentTracer {
+public class Layout2Lua extends DocumentTracer {
 
 	private static String inputFileBasename;
 	
@@ -27,18 +27,26 @@ public class Layout2Deelang extends DocumentTracer {
 
 	@Override
 	public void startDocument() throws SAXException {
+		printLua("function newView(Builder)");
+		fIndent++;
 		allowBlankLine = false;
 	}
 
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
-		if (output != null) {
-			try {
-				output.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		
+		fIndent--;
+		printLua("end");  // newView
+		printLua("");
+		printLua("function bindView(Holder)");
+		printLua("    -- TODO");
+		printLua("end");
+		
+		try {
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -46,7 +54,7 @@ public class Layout2Deelang extends DocumentTracer {
 	public void startElement(String uri, String localName, String qname, Attributes attributes) throws SAXException {
 		if (!Elements.supported.contains(localName)) {
 			System.err.println("startElement: Unsupported element: " + localName);
-			printUnsupportedElementDeelang(localName, attributes);
+			printUnsupportedElementLua(localName, attributes);
 			return;
 		}
 
@@ -60,19 +68,19 @@ public class Layout2Deelang extends DocumentTracer {
 			id = viewName;
 		
 		if (Elements.VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:addView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.TEXT_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addTextView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:addTextView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_VIEW.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addImageView(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:addImageView(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.PROGRESS_BAR.equals(localName)) {
-			printDeelang(String.format(Locale.ENGLISH, "%s = addProgressBar(\"%s\")", viewName, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:addProgressBar(\"%s\")", viewName, id));
 			needsIndent = false;
 		}
 		else if (Elements.BUTTON.equals(localName)) {
@@ -81,7 +89,7 @@ public class Layout2Deelang extends DocumentTracer {
 				method = "addButtonSmall";
 			else
 				method = "addButton";
-			printDeelang(String.format(Locale.ENGLISH, "%s = %s(\"%s\")", viewName, method, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:%s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.IMAGE_BUTTON.equals(localName)) {
@@ -90,30 +98,30 @@ public class Layout2Deelang extends DocumentTracer {
 				method = "addImageButtonSmall";
 			else
 				method = "addImageButton";
-			printDeelang(String.format(Locale.ENGLISH, "%s = %s(\"%s\")", viewName, method, id));
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:%s(\"%s\")", viewName, method, id));
 			needsIndent = false;
 		}
 		else if (Elements.FRAME_LAYOUT.equals(localName) || Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
-			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginFrameLayout(\"%s\")", viewName, id));
+			printLua("");
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginFrameLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
-			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginLinearLayout(\"%s\")", viewName, id));
+			printLua("");
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginLinearLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
-			printDeelang("");
-			printDeelang(String.format(Locale.ENGLISH, "%s = beginRelativeLayout(\"%s\")", viewName, id));
+			printLua("");
+			printLua(String.format(Locale.ENGLISH, "%s = Builder:beginRelativeLayout(\"%s\")", viewName, id));
 			needsIndent = true;
 		}
 		else {
 			throw new IllegalStateException("startElement: unhandled element name: " + localName);
 		}
 		
-		printUnsupportedAttributesDeelang(attributes);
-		printAttributesDeelang(viewName, attributes);
+		printUnsupportedAttributesLua(attributes);
+		printAttributesLua(viewName, attributes);
 		
 		if (needsIndent)
 			fIndent++;
@@ -136,10 +144,10 @@ public class Layout2Deelang extends DocumentTracer {
 		return null;
 	}
 	
-	private void printUnsupportedElementDeelang(String localName, Attributes attributes) {
+	private void printUnsupportedElementLua(String localName, Attributes attributes) {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("// UNSUPPORTED ELEMENT: ").append(localName).append("; ");
+		builder.append("-- UNSUPPORTED ELEMENT: ").append(localName).append("; ");
 		
 		builder.append("attributes=");
         if (attributes == null) {
@@ -178,7 +186,7 @@ public class Layout2Deelang extends DocumentTracer {
         }
         builder.append(')');
         
-        printDeelang(builder.toString());
+        printLua(builder.toString());
 	}
 
 	@Override
@@ -190,23 +198,23 @@ public class Layout2Deelang extends DocumentTracer {
 		
 		if (Elements.FRAME_LAYOUT.equals(localName)) {
 			fIndent--;
-			printDeelang("end()");
-			printDeelang("");
+			printLua("Builder:endFrameLayout()");
+			printLua("");
 		}
 		else if (Elements.DONT_PRESS_WITH_PARENT_FRAME_LAYOUT.equals(localName)) {
 			fIndent--;
-			printDeelang("end()");
-			printDeelang("");
+			printLua("Builder:endFrameLayout()");
+			printLua("");
 		}
 		else if (Elements.LINEAR_LAYOUT.equals(localName)) {
 			fIndent--;
-			printDeelang("end()");
-			printDeelang("");
+			printLua("Builder:endLinearLayout()");
+			printLua("");
 		}
 		else if (Elements.RELATIVE_LAYOUT.equals(localName)) {
 			fIndent--;
-			printDeelang("end()");
-			printDeelang("");
+			printLua("Builder:endRelativeLayout()");
+			printLua("");
 		}
 	}
 
@@ -241,12 +249,12 @@ public class Layout2Deelang extends DocumentTracer {
 	}
 	
 	/**
-	 * Print to the Deelang output.
+	 * Print to the Lua output.
 	 */
-	protected void printDeelang(String line) {
+	protected void printLua(String line) {
 		try {
 			if (output == null) {
-				String name = inputFileBasename.substring(0, inputFileBasename.lastIndexOf('.')) + "." + System.currentTimeMillis() + ".dl";
+				String name = inputFileBasename.substring(0, inputFileBasename.lastIndexOf('.')) + "." + System.currentTimeMillis() + ".lua";
 				output = new FileWriter(new File(name));
 			}
 			
@@ -259,12 +267,11 @@ public class Layout2Deelang extends DocumentTracer {
 			}
 			else {
 				allowBlankLine = true;
-				
-				// Deelang compiler chokes on whitespace-only lines
-				for (int i = 0; i < fIndent; i++)
-					output.write("    ");
 			}
 			
+			for (int i = 0; i < fIndent; i++)
+				output.write("    ");
+
 			output.write(line + "\n");
 			
 		} catch (IOException e) {
@@ -273,15 +280,15 @@ public class Layout2Deelang extends DocumentTracer {
 	}
 	
 	/**
-	 * Print attributes currently unsupported by layout2deelang.
+	 * Print attributes currently unsupported by layout2lua.
 	 */
-	protected void printUnsupportedAttributesDeelang(Attributes attributes) {
+	protected void printUnsupportedAttributesLua(Attributes attributes) {
 		int length = attributes.getLength();
 		for (int i = 0; i < length; i++) {
 			String qname = attributes.getQName(i);
 			String value = attributes.getValue(qname);
 			if (!AndroidAttributes.supported.contains(qname) && !AndroidAttributes.supportedByValue.contains(String.format(Locale.ENGLISH, "%s=\"%s\"", qname, value))) {
-				printDeelang(String.format(Locale.ENGLISH, "// UNSUPPORTED ATTRIBUTE: %s=\"%s\"", qname, attributes.getValue(qname)));
+				printLua(String.format(Locale.ENGLISH, "-- UNSUPPORTED ATTRIBUTE: %s=\"%s\"", qname, attributes.getValue(qname)));
 			}
 		}
 	}
@@ -289,7 +296,7 @@ public class Layout2Deelang extends DocumentTracer {
 	/**
 	 * Print attributes associated with the View element.
 	 */
-	protected void printAttributesDeelang(String viewName, Attributes attributes) {
+	protected void printAttributesLua(String viewName, Attributes attributes) {
 		//
 		// View
 		//
@@ -297,27 +304,27 @@ public class Layout2Deelang extends DocumentTracer {
 		// layout_width and layout_height are required; assume present
 		String layout_width = attributes.getValue("android:layout_width");
 		String layout_height = attributes.getValue("android:layout_height");
-		printFixmeIfNeededDeelang(layout_width);
-		printFixmeIfNeededDeelang(layout_height);
-		printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutSize(\"%s\", \"%s\")", viewName, layout_width, layout_height));
+		printFixmeIfNeededLua(layout_width);
+		printFixmeIfNeededLua(layout_height);
+		printLua(String.format(Locale.ENGLISH, "%s:setLayoutSize(\"%s\", \"%s\")", viewName, layout_width, layout_height));
 		
 		// layout_weight
 		String layout_weight = attributes.getValue("android:layout_weight");
-		printFixmeIfNeededDeelang(layout_weight);
+		printFixmeIfNeededLua(layout_weight);
 		if (layout_weight != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutWeight(%f)", viewName, Float.parseFloat(layout_weight)));
+			printLua(String.format(Locale.ENGLISH, "%s:setLayoutWeight(%f)", viewName, Float.parseFloat(layout_weight)));
 		
 		// layout_gravity
 		String layout_gravity = attributes.getValue("android:layout_gravity");
-		printFixmeIfNeededDeelang(layout_gravity);
+		printFixmeIfNeededLua(layout_gravity);
 		if (layout_gravity != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutGravity(\"%s\")", viewName, layout_gravity));
+			printLua(String.format(Locale.ENGLISH, "%s:setLayoutGravity(\"%s\")", viewName, layout_gravity));
 		
 		// layout_margin*
 		String layout_margin = attributes.getValue("android:layout_margin");
-		printFixmeIfNeededDeelang(layout_margin);
+		printFixmeIfNeededLua(layout_margin);
 		if (layout_margin != null) {
-			printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMargin(\"%s\")", viewName, layout_margin));
+			printLua(String.format(Locale.ENGLISH, "%s:setLayoutMargin(\"%s\")", viewName, layout_margin));
 		}
 		else {
 			String layout_marginLeft   = attributes.getValue("android:layout_marginLeft");
@@ -325,72 +332,72 @@ public class Layout2Deelang extends DocumentTracer {
 			String layout_marginRight  = attributes.getValue("android:layout_marginRight");
 			String layout_marginBottom = attributes.getValue("android:layout_marginBottom");
 			if (layout_marginLeft != null && layout_marginTop != null && layout_marginRight != null && layout_marginBottom != null) {
-				printFixmeIfNeededDeelang(layout_marginLeft);
-				printFixmeIfNeededDeelang(layout_marginTop);
-				printFixmeIfNeededDeelang(layout_marginRight);
-				printFixmeIfNeededDeelang(layout_marginBottom);
-				printDeelang(String.format(
-						Locale.ENGLISH, "%s.setLayoutMargins(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, layout_marginLeft, layout_marginTop, layout_marginRight, layout_marginBottom
+				printFixmeIfNeededLua(layout_marginLeft);
+				printFixmeIfNeededLua(layout_marginTop);
+				printFixmeIfNeededLua(layout_marginRight);
+				printFixmeIfNeededLua(layout_marginBottom);
+				printLua(String.format(
+						Locale.ENGLISH, "%s:setLayoutMargins(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, layout_marginLeft, layout_marginTop, layout_marginRight, layout_marginBottom
 				));
 			}
 			else {
-				printFixmeIfNeededDeelang(layout_marginLeft);
+				printFixmeIfNeededLua(layout_marginLeft);
 				if (layout_marginLeft != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginLeft(\"%s\")", viewName, layout_marginLeft));
-				printFixmeIfNeededDeelang(layout_marginTop);
+					printLua(String.format(Locale.ENGLISH, "%s:setLayoutMarginLeft(\"%s\")", viewName, layout_marginLeft));
+				printFixmeIfNeededLua(layout_marginTop);
 				if (layout_marginTop != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginTop(\"%s\")", viewName, layout_marginTop));
-				printFixmeIfNeededDeelang(layout_marginRight);
+					printLua(String.format(Locale.ENGLISH, "%s:setLayoutMarginTop(\"%s\")", viewName, layout_marginTop));
+				printFixmeIfNeededLua(layout_marginRight);
 				if (layout_marginRight != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginRight(\"%s\")", viewName, layout_marginRight));
-				printFixmeIfNeededDeelang(layout_marginBottom);
+					printLua(String.format(Locale.ENGLISH, "%s:setLayoutMarginRight(\"%s\")", viewName, layout_marginRight));
+				printFixmeIfNeededLua(layout_marginBottom);
 				if (layout_marginBottom != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setLayoutMarginBottom(\"%s\")", viewName, layout_marginBottom));
+					printLua(String.format(Locale.ENGLISH, "%s:setLayoutMarginBottom(\"%s\")", viewName, layout_marginBottom));
 			}
 		}
 		
 		// orientation
 		String orientation = attributes.getValue("android:orientation");
-		printFixmeIfNeededDeelang(orientation);
+		printFixmeIfNeededLua(orientation);
 		if (orientation != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setOrientation(\"%s\")", viewName, orientation));
+			printLua(String.format(Locale.ENGLISH, "%s:setOrientation(\"%s\")", viewName, orientation));
 		
 		// minWidth and minHeight
 		String minWidth  = attributes.getValue("android:minWidth");
 		String minHeight = attributes.getValue("android:minHeight");
-		printFixmeIfNeededDeelang(minWidth);
+		printFixmeIfNeededLua(minWidth);
 		if (minWidth != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setMinWidth(\"%s\")", viewName, minWidth));
-		printFixmeIfNeededDeelang(minHeight);
+			printLua(String.format(Locale.ENGLISH, "%s:setMinWidth(\"%s\")", viewName, minWidth));
+		printFixmeIfNeededLua(minHeight);
 		if (minHeight != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setMinHeight(\"%s\")", viewName, minHeight));
+			printLua(String.format(Locale.ENGLISH, "%s:setMinHeight(\"%s\")", viewName, minHeight));
 		
 		// descendantFocusability
 		String descendantFocusability = attributes.getValue("android:descendantFocusability");
-		printFixmeIfNeededDeelang(descendantFocusability);
+		printFixmeIfNeededLua(descendantFocusability);
 		if (descendantFocusability != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setDescendantFocusability(\"%s\")", viewName, descendantFocusability));
+			printLua(String.format(Locale.ENGLISH, "%s:setDescendantFocusability(\"%s\")", viewName, descendantFocusability));
 
 		// background
 		String background = attributes.getValue("android:background");
 		if (background != null) {
 			if ("?attr/actionBarItemBackground".equals(background)) {
-				printDeelang(viewName + ".setBackgroundDrawable(getSelectableItemBackground())");
+				printLua(viewName + ":setBackgroundDrawable(getSelectableItemBackground())");
 			}
 			else {
-				printFixmeIfNeededDeelang(background);
+				printFixmeIfNeededLua(background);
 				if (background.startsWith("@drawable/") || background.endsWith(".png") || background.endsWith(".xml"))
-					printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundDrawable(\"%s\")", viewName, background));
+					printLua(String.format(Locale.ENGLISH, "%s:setBackgroundDrawable(\"%s\")", viewName, background));
 				else if (background.startsWith("@color/") || background.startsWith("#"))
-					printDeelang(String.format(Locale.ENGLISH, "%s.setBackgroundColor(\"%s\")", viewName, background));
+					printLua(String.format(Locale.ENGLISH, "%s:setBackgroundColor(\"%s\")", viewName, background));
 			}
 		}
 		
 		// padding -- NOTE: must come after background! // http://stackoverflow.com/questions/10392688/android-listview-row-layout-ignoring-padding
 		String padding = attributes.getValue("android:padding");
 		if (padding != null) {
-			printFixmeIfNeededDeelang(padding);
-			printDeelang(String.format(Locale.ENGLISH, "%s.setPadding(\"%s\")", viewName, padding));
+			printFixmeIfNeededLua(padding);
+			printLua(String.format(Locale.ENGLISH, "%s:setPadding(\"%s\")", viewName, padding));
 		}
 		else {
 			String paddingLeft   = attributes.getValue("android:paddingLeft");
@@ -398,47 +405,47 @@ public class Layout2Deelang extends DocumentTracer {
 			String paddingRight  = attributes.getValue("android:paddingRight");
 			String paddingBottom = attributes.getValue("android:paddingBottom");
 			if (paddingLeft != null && paddingTop != null && paddingRight != null && paddingBottom != null) {
-				printFixmeIfNeededDeelang(paddingLeft);
-				printFixmeIfNeededDeelang(paddingTop);
-				printFixmeIfNeededDeelang(paddingRight);
-				printFixmeIfNeededDeelang(paddingBottom);
-				printDeelang(String.format(
-						Locale.ENGLISH, "%s.setPadding(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, paddingLeft, paddingTop, paddingRight, paddingBottom
+				printFixmeIfNeededLua(paddingLeft);
+				printFixmeIfNeededLua(paddingTop);
+				printFixmeIfNeededLua(paddingRight);
+				printFixmeIfNeededLua(paddingBottom);
+				printLua(String.format(
+						Locale.ENGLISH, "%s:setPadding(\"%s\", \"%s\", \"%s\", \"%s\")", viewName, paddingLeft, paddingTop, paddingRight, paddingBottom
 				));
 			}
 			else {
-				printFixmeIfNeededDeelang(paddingLeft);
+				printFixmeIfNeededLua(paddingLeft);
 				if (paddingLeft != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingLeft(\"%s\")", viewName, paddingLeft));
-				printFixmeIfNeededDeelang(paddingTop);
+					printLua(String.format(Locale.ENGLISH, "%s:setPaddingLeft(\"%s\")", viewName, paddingLeft));
+				printFixmeIfNeededLua(paddingTop);
 				if (paddingTop != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingTop(\"%s\")", viewName, paddingTop));
-				printFixmeIfNeededDeelang(paddingRight);
+					printLua(String.format(Locale.ENGLISH, "%s:setPaddingTop(\"%s\")", viewName, paddingTop));
+				printFixmeIfNeededLua(paddingRight);
 				if (paddingRight != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingRight(\"%s\")", viewName, paddingRight));
-				printFixmeIfNeededDeelang(paddingBottom);
+					printLua(String.format(Locale.ENGLISH, "%s:setPaddingRight(\"%s\")", viewName, paddingRight));
+				printFixmeIfNeededLua(paddingBottom);
 				if (paddingBottom != null)
-					printDeelang(String.format(Locale.ENGLISH, "%s.setPaddingBottom(\"%s\")", viewName, paddingBottom));
+					printLua(String.format(Locale.ENGLISH, "%s:setPaddingBottom(\"%s\")", viewName, paddingBottom));
 			}
 		}
 		
 		// visibility
 		String visibility = attributes.getValue("android:visibility");
-		printFixmeIfNeededDeelang(visibility);
+		printFixmeIfNeededLua(visibility);
 		if (visibility != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setVisibility(\"%s\")", viewName, visibility));
+			printLua(String.format(Locale.ENGLISH, "%s:setVisibility(\"%s\")", viewName, visibility));
 		
 		// onClick
 		String onClick = attributes.getValue("android:onClick");
-		printFixmeIfNeededDeelang(onClick);
+		printFixmeIfNeededLua(onClick);
 		if (onClick != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setOnClick(\"%s\")", viewName, onClick));
+			printLua(String.format(Locale.ENGLISH, "%s:setOnClick(\"%s\")", viewName, onClick));
 		
 		// clickable
 		String clickable = attributes.getValue("android:clickable");
-		printFixmeIfNeededDeelang(clickable);
+		printFixmeIfNeededLua(clickable);
 		if (clickable != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setClickable(\"%s\")", viewName, clickable));
+			printLua(String.format(Locale.ENGLISH, "%s:setClickable(\"%s\")", viewName, clickable));
 		
 		//
 		// TextView
@@ -446,64 +453,64 @@ public class Layout2Deelang extends DocumentTracer {
 		
 		// TextView: gravity
 		String gravity = attributes.getValue("android:gravity");
-		printFixmeIfNeededDeelang(gravity);
+		printFixmeIfNeededLua(gravity);
 		if (gravity != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setGravity(\"%s\")", viewName, gravity));
+			printLua(String.format(Locale.ENGLISH, "%s:setGravity(\"%s\")", viewName, gravity));
 		
 		// TextView: text
 		String text = attributes.getValue("android:text");
-		printFixmeIfNeededDeelang(text);
+		printFixmeIfNeededLua(text);
 		if (text != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setText(\"%s\")", viewName, text));
+			printLua(String.format(Locale.ENGLISH, "%s:setText(\"%s\")", viewName, text));
 		
 		// TextView: textAppearance
 		String textAppearance = attributes.getValue("android:textAppearance");
 		if ("?android:attr/textAppearanceSmall".equals(textAppearance)) {
-			printDeelang(viewName + ".setTextSize(TEXT_SIZE_SMALL)");
-			printDeelang(viewName + ".setTextColor(TEXT_COLOR_SECONDARY)");
+			printLua(viewName + ":setTextSize(TEXT_SIZE_SMALL)");
+			printLua(viewName + ":setTextColor(TEXT_COLOR_SECONDARY)");
 		}
 		else if ("?android:attr/textAppearanceMedium".equals(textAppearance)) {
-			printDeelang(viewName + ".setTextSize(TEXT_SIZE_MEDIUM)");
+			printLua(viewName + ":setTextSize(TEXT_SIZE_MEDIUM)");
 		}
 		else if ("?android:attr/textAppearanceLarge".equals(textAppearance)) {
-			printDeelang(viewName + ".setTextSize(TEXT_SIZE_LARGE)");
+			printLua(viewName + ":setTextSize(TEXT_SIZE_LARGE)");
 		}
 		
 		// TextView: textColor
 		String textColor = attributes.getValue("android:textColor");
-		printFixmeIfNeededDeelang(textColor);
+		printFixmeIfNeededLua(textColor);
 		if (textColor != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setTextColor(\"%s\")", viewName, textColor));
+			printLua(String.format(Locale.ENGLISH, "%s:setTextColor(\"%s\")", viewName, textColor));
 		
 		// TextView: textStyle
 		String textStyle = attributes.getValue("android:textStyle");
-		printFixmeIfNeededDeelang(textStyle);
+		printFixmeIfNeededLua(textStyle);
 		if (textStyle != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setTextStyle(\"%s\")", viewName, textStyle));
+			printLua(String.format(Locale.ENGLISH, "%s:setTextStyle(\"%s\")", viewName, textStyle));
 		
 		// TextView: textSize
 		String textSize = attributes.getValue("android:textSize");
-		printFixmeIfNeededDeelang(textSize);
+		printFixmeIfNeededLua(textSize);
 		if (textSize != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setTextSize(\"%s\")", viewName, textSize));
+			printLua(String.format(Locale.ENGLISH, "%s:setTextSize(\"%s\")", viewName, textSize));
 		
 		// TextView: singleLine
 		String singleLine = attributes.getValue("android:singleLine");
-		printFixmeIfNeededDeelang(singleLine);
+		printFixmeIfNeededLua(singleLine);
 		if (singleLine != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setSingleLine(\"%s\")", viewName, singleLine));
+			printLua(String.format(Locale.ENGLISH, "%s:setSingleLine(\"%s\")", viewName, singleLine));
 		
 		// TextView: ellipsize
 		String ellipsize = attributes.getValue("android:ellipsize");
-		printFixmeIfNeededDeelang(ellipsize);
+		printFixmeIfNeededLua(ellipsize);
 		if (ellipsize != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setEllipsize(\"%s\")", viewName, ellipsize));
+			printLua(String.format(Locale.ENGLISH, "%s:setEllipsize(\"%s\")", viewName, ellipsize));
 		
 		// TextView: linksClickable
 		String linksClickable = attributes.getValue("android:linksClickable");
-		printFixmeIfNeededDeelang(linksClickable);
+		printFixmeIfNeededLua(linksClickable);
 		if (linksClickable != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setLinksClickable(\"%s\")", viewName, linksClickable));
+			printLua(String.format(Locale.ENGLISH, "%s:setLinksClickable(\"%s\")", viewName, linksClickable));
 		
 		//
 		// ImageView
@@ -511,22 +518,22 @@ public class Layout2Deelang extends DocumentTracer {
 		
 		// ImageView: src
 		String src = attributes.getValue("android:src");
-		printFixmeIfNeededDeelang(src);
+		printFixmeIfNeededLua(src);
 		if (src != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setDrawable(\"%s\")", viewName, src));
+			printLua(String.format(Locale.ENGLISH, "%s:setDrawable(\"%s\")", viewName, src));
 			
 		// ImageView: contentDescription
 		String contentDescription = attributes.getValue("android:contentDescription");
-		printFixmeIfNeededDeelang(contentDescription);
+		printFixmeIfNeededLua(contentDescription);
 		if (contentDescription != null)
-			printDeelang(String.format(Locale.ENGLISH, "%s.setContentDescription(\"%s\")", viewName, contentDescription));
+			printLua(String.format(Locale.ENGLISH, "%s:setContentDescription(\"%s\")", viewName, contentDescription));
 		
-		// printDeelang(String.format(Locale.ENGLISH, "%s.set???(\"%s\")", viewName, ???));
+		// printLua(String.format(Locale.ENGLISH, "%s:set???(\"%s\")", viewName, ???));
 	}
 	
-	private void printFixmeIfNeededDeelang(String attributeValue) {
+	private void printFixmeIfNeededLua(String attributeValue) {
 		if (attributeValue != null && (attributeValue.startsWith("@") || attributeValue.startsWith("?")))
-			printDeelang("// FIXME: replace reference \"" + attributeValue + "\" with value");
+			printLua("-- FIXME: replace reference \"" + attributeValue + "\" with value");
 	}
 	
 	
@@ -544,7 +551,7 @@ public class Layout2Deelang extends DocumentTracer {
         }
 
         // variables
-        DocumentTracer tracer = new Layout2Deelang();
+        DocumentTracer tracer = new Layout2Lua();
         XMLReader parser = null;
         boolean namespaces = DEFAULT_NAMESPACES;
         boolean namespacePrefixes = DEFAULT_NAMESPACE_PREFIXES;
