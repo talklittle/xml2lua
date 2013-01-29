@@ -382,14 +382,14 @@ public class Layout2Lua extends DocumentTracer {
 		String background = attributes.getValue("android:background");
 		if (background != null) {
 			if ("?attr/actionBarItemBackground".equals(background)) {
-				printLua(viewName + ":setBackgroundDrawable(getSelectableItemBackground())");
+				printLua(viewName + ":setBackground(ACTIONBAR_ITEM_BACKGROUND)");
 			}
 			else {
 				printFixmeIfNeededLua(background);
 				if (background.startsWith("@drawable/") || background.endsWith(".png") || background.endsWith(".xml"))
-					printLua(String.format(Locale.ENGLISH, "%s:setBackgroundDrawable(\"%s\")", viewName, background));
+					printLua(String.format(Locale.ENGLISH, "%s:setBackground(\"%s\")", viewName, background));
 				else if (background.startsWith("@color/") || background.startsWith("#"))
-					printLua(String.format(Locale.ENGLISH, "%s:setBackgroundColor(\"%s\")", viewName, background));
+					printLua(String.format(Locale.ENGLISH, "%s:setBackground(\"%s\")", viewName, background));
 			}
 		}
 		
@@ -498,7 +498,7 @@ public class Layout2Lua extends DocumentTracer {
 		String singleLine = attributes.getValue("android:singleLine");
 		printFixmeIfNeededLua(singleLine);
 		if (singleLine != null)
-			printLua(String.format(Locale.ENGLISH, "%s:setSingleLine(\"%s\")", viewName, singleLine));
+			printLua(String.format(Locale.ENGLISH, "%s:setSingleLine(%s)", viewName, singleLine));
 		
 		// TextView: ellipsize
 		String ellipsize = attributes.getValue("android:ellipsize");
