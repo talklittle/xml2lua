@@ -531,6 +531,8 @@ public class Layout2Lua extends DocumentTracer {
 		// ImageView: scaleType
 		String scaleType = attributes.getValue("android:scaleType");
 		printFixmeIfNeededLua(scaleType);
+		if (scaleType == null && src != null)
+			scaleType = "fitCenter";  // otherwise I think it defaults to "center" which is usually wrong
 		if (scaleType != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setScaleType(\"%s\")", viewName, scaleType));
 		
