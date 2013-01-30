@@ -45,6 +45,7 @@ public class AndroidAttributes {
 		
 		supported.add("android:src");
 		supported.add("android:contentDescription");
+		supported.add("android:scaleType");
 	}
 	
 	static final HashSet<String> supportedByValue = new HashSet<String>();

@@ -528,6 +528,12 @@ public class Layout2Lua extends DocumentTracer {
 		if (contentDescription != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setContentDescription(\"%s\")", viewName, contentDescription));
 		
+		// ImageView: scaleType
+		String scaleType = attributes.getValue("android:scaleType");
+		printFixmeIfNeededLua(scaleType);
+		if (scaleType != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setScaleType(\"%s\")", viewName, scaleType));
+		
 		// printLua(String.format(Locale.ENGLISH, "%s:set???(\"%s\")", viewName, ???));
 	}
 	
