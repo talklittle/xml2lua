@@ -40,6 +40,10 @@ public class AndroidAttributes {
 		supported.add("android:singleLine");
 		supported.add("android:ellipsize");
 		supported.add("android:linksClickable");
+		supported.add("android:drawableLeft");
+		supported.add("android:drawableTop");
+		supported.add("android:drawableRight");
+		supported.add("android:drawableBottom");
 		
 		// ImageView
 		

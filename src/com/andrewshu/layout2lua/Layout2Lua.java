@@ -512,6 +512,24 @@ public class Layout2Lua extends DocumentTracer {
 		if (linksClickable != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setLinksClickable(%s)", viewName, linksClickable));
 		
+		// TextView: drawableLeft, drawableTop, drawableRight, drawableBottom
+		String drawableLeft = attributes.getValue("android:drawableLeft");
+		printFixmeIfNeededLua(drawableLeft);
+		if (drawableLeft != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setDrawableLeft(\"%s\")", viewName, drawableLeft));
+		String drawableTop = attributes.getValue("android:drawableTop");
+		printFixmeIfNeededLua(drawableTop);
+		if (drawableTop != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setDrawableTop(\"%s\")", viewName, drawableTop));
+		String drawableRight = attributes.getValue("android:drawableRight");
+		printFixmeIfNeededLua(drawableRight);
+		if (drawableRight != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setDrawableRight(\"%s\")", viewName, drawableRight));
+		String drawableBottom = attributes.getValue("android:drawableBottom");
+		printFixmeIfNeededLua(drawableBottom);
+		if (drawableBottom != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setDrawableBottom(\"%s\")", viewName, drawableBottom));
+		
 		//
 		// ImageView
 		//
