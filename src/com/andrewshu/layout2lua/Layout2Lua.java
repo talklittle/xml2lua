@@ -385,11 +385,19 @@ public class Layout2Lua extends DocumentTracer {
 				printLua(viewName + ":setBackground(ACTIONBAR_ITEM_BACKGROUND)");
 			}
 			else {
-				printFixmeIfNeededLua(background);
-				if (background.startsWith("@drawable/") || background.endsWith(".png") || background.endsWith(".xml"))
+				boolean supportedBackgroundValue =
+						background.startsWith("@drawable/") ||
+						background.endsWith(".png") ||
+						background.endsWith(".xml") ||
+						background.startsWith("@color/") ||
+						background.startsWith("#");
+				if (supportedBackgroundValue) {
+					printFixmeIfNeededLua(background);
 					printLua(String.format(Locale.ENGLISH, "%s:setBackground(\"%s\")", viewName, background));
-				else if (background.startsWith("@color/") || background.startsWith("#"))
-					printLua(String.format(Locale.ENGLISH, "%s:setBackground(\"%s\")", viewName, background));
+				}
+				else {
+					printLua("-- UNSUPPORTED VALUE for android:background: " + background);
+				}
 			}
 		}
 		
