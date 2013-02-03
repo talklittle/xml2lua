@@ -157,7 +157,7 @@ public class Layout2Lua extends DocumentTracer {
 	private void printUnsupportedElementLua(String localName, Attributes attributes) {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("-- UNSUPPORTED ELEMENT: ").append(localName).append("; ");
+		builder.append("-- FIXME: UNSUPPORTED ELEMENT: ").append(localName).append("; ");
 		
 		builder.append("attributes=");
         if (attributes == null) {
@@ -298,7 +298,7 @@ public class Layout2Lua extends DocumentTracer {
 			String qname = attributes.getQName(i);
 			String value = attributes.getValue(qname);
 			if (!AndroidAttributes.supported.contains(qname) && !AndroidAttributes.supportedByValue.contains(String.format(Locale.ENGLISH, "%s=\"%s\"", qname, value))) {
-				printLua(String.format(Locale.ENGLISH, "-- UNSUPPORTED ATTRIBUTE: %s=\"%s\"", qname, attributes.getValue(qname)));
+				printLua(String.format(Locale.ENGLISH, "-- FIXME: UNSUPPORTED ATTRIBUTE: %s=\"%s\"", qname, attributes.getValue(qname)));
 			}
 		}
 	}
@@ -406,7 +406,7 @@ public class Layout2Lua extends DocumentTracer {
 					printLua(String.format(Locale.ENGLISH, "%s:setBackground(\"%s\")", viewName, background));
 				}
 				else {
-					printLua("-- UNSUPPORTED VALUE for android:background: " + background);
+					printLua("-- FIXME: UNSUPPORTED VALUE for android:background: " + background);
 				}
 			}
 		}
