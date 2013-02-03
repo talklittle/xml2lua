@@ -49,7 +49,7 @@ public class Layout2Lua extends DocumentTracer {
 		fIndent--;
 		printLua("end");  // newView
 		printLua("");
-		printLua("function bindView(Holder)");
+		printLua("function bindView(Holder, Thing, List)");
 		printLua("    -- TODO");
 		printLua("end");
 		
