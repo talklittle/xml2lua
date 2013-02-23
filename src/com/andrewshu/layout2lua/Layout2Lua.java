@@ -230,31 +230,26 @@ public class Layout2Lua extends DocumentTracer {
 
 	@Override
 	public void startEntity(String name) throws SAXException {
-		// TODO Auto-generated method stub
 		super.startEntity(name);
 	}
 
 	@Override
 	public void endEntity(String name) throws SAXException {
-		// TODO Auto-generated method stub
 		super.endEntity(name);
 	}
 
 	@Override
 	public void warning(SAXParseException ex) throws SAXException {
-		// TODO Auto-generated method stub
 		super.warning(ex);
 	}
 
 	@Override
 	public void error(SAXParseException ex) throws SAXException {
-		// TODO Auto-generated method stub
 		super.error(ex);
 	}
 
 	@Override
 	public void fatalError(SAXParseException ex) throws SAXException {
-		// TODO Auto-generated method stub
 		super.fatalError(ex);
 	}
 	
