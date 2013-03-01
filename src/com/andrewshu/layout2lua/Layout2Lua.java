@@ -37,6 +37,8 @@ public class Layout2Lua extends DocumentTracer {
 		printLua("local Spans = redditisfun.Spans");
 		printLua("");
 		
+		printLua("---");
+		printLua("-- @usage exported");
 		printLua("function newView(Builder)");
 		fIndent++;
 		allowBlankLine = false;
@@ -49,6 +51,8 @@ public class Layout2Lua extends DocumentTracer {
 		fIndent--;
 		printLua("end");  // newView
 		printLua("");
+		printLua("---");
+		printLua("-- @usage exported");
 		printLua("function bindView(Holder, Thing, List)");
 		printLua("    -- TODO");
 		printLua("end");
