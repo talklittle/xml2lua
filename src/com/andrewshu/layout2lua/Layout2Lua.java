@@ -53,7 +53,7 @@ public class Layout2Lua extends DocumentTracer {
 		printLua("");
 		printLua("---");
 		printLua("-- @usage exported");
-		printLua("function bindView(Holder, Thing, List)");
+		printLua("function bindView(Holder, Thing, ListItem)");
 		printLua("    -- TODO");
 		printLua("end");
 		
