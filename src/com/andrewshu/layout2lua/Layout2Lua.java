@@ -31,10 +31,12 @@ public class Layout2Lua extends DocumentTracer {
 		printLua("local TEXT_SIZE_LARGE = redditisfun.TEXT_SIZE_LARGE");
 		printLua("local TEXT_SIZE_MEDIUM = redditisfun.TEXT_SIZE_MEDIUM");
 		printLua("local TEXT_SIZE_SMALL = redditisfun.TEXT_SIZE_SMALL");
+		printLua("local TEXT_COLOR_PRIMARY = redditisfun.TEXT_COLOR_PRIMARY");
 		printLua("local TEXT_COLOR_SECONDARY = redditisfun.TEXT_COLOR_SECONDARY");
 		printLua("local ACTIONBAR_ITEM_BACKGROUND = redditisfun.ACTIONBAR_ITEM_BACKGROUND");
 		printLua("local Fonts = redditisfun.Fonts");
 		printLua("local Spans = redditisfun.Spans");
+		printLua("local Toasts = redditisfun.Toasts");
 		printLua("");
 		
 		printLua("---");
