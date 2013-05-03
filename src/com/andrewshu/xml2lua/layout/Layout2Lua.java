@@ -1,4 +1,4 @@
-package com.andrewshu.layout2lua;
+package com.andrewshu.xml2lua.layout;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,6 +15,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import sax.DocumentTracer;
+
+import com.andrewshu.xml2lua.AndroidAttributes;
+import com.andrewshu.xml2lua.Elements;
 
 public class Layout2Lua extends DocumentTracer {
 
