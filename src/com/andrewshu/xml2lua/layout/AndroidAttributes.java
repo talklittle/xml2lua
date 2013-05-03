@@ -1,10 +1,10 @@
-package com.andrewshu.xml2lua;
+package com.andrewshu.xml2lua.layout;
 
 import java.util.HashSet;
 
 public class AndroidAttributes {
 	
-	public static final HashSet<String> supported = new HashSet<String>();
+	static final HashSet<String> supported = new HashSet<String>();
 	static {
 		supported.add("android:id");
 		supported.add("android:layout_width");
@@ -52,7 +52,7 @@ public class AndroidAttributes {
 		supported.add("android:scaleType");
 	}
 	
-	public static final HashSet<String> supportedByValue = new HashSet<String>();
+	static final HashSet<String> supportedByValue = new HashSet<String>();
 	static {
 		supportedByValue.add("android:textAppearance=\"?android:attr/textAppearanceSmall\"");
 		supportedByValue.add("android:textAppearance=\"?android:attr/textAppearanceMedium\"");
