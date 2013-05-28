@@ -7,9 +7,9 @@ Usage
 -----
 
     # Generate a .lua file in current directory, for layout xml
-    com.andrewshu.xml2lua.layout.Layout2Lua <path_to_xml_file>
+    java com.andrewshu.xml2lua.layout.Layout2Lua <path_to_xml_file>
 
     # Generate a .lua file in current directory, for drawable xml
-    com.andrewshu.xml2lua.drawable.Drawable2Lua <path_to_xml_file>
+    java com.andrewshu.xml2lua.drawable.Drawable2Lua <path_to_xml_file>
 
 
