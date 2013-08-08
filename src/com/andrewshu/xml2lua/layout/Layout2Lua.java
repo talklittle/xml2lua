@@ -566,6 +566,12 @@ public class Layout2Lua extends DocumentTracer {
 		if (contentDescription != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setContentDescription(\"%s\")", viewName, contentDescription));
 		
+		// ImageView: adjustViewBounds
+		String adjustViewBounds = attributes.getValue("android:adjustViewBounds");
+		printFixmeIfNeededLua(adjustViewBounds);
+		if (adjustViewBounds != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setAdjustViewBounds(\"%s\")", viewName, adjustViewBounds));
+		
 		// ImageView: scaleType
 		String scaleType = attributes.getValue("android:scaleType");
 		printFixmeIfNeededLua(scaleType);
@@ -573,12 +579,6 @@ public class Layout2Lua extends DocumentTracer {
 			scaleType = "fitCenter";  // otherwise I think it defaults to "center" which is usually wrong
 		if (scaleType != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setScaleType(\"%s\")", viewName, scaleType));
-		
-		// ImageView: adjustViewBounds
-		String adjustViewBounds = attributes.getValue("android:adjustViewBounds");
-		printFixmeIfNeededLua(adjustViewBounds);
-		if (adjustViewBounds != null)
-			printLua(String.format(Locale.ENGLISH, "%s:setAdjustViewBounds(\"%s\")", viewName, adjustViewBounds));
 		
 		// printLua(String.format(Locale.ENGLISH, "%s:set???(\"%s\")", viewName, ???));
 	}
