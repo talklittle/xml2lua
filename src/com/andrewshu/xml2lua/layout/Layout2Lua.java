@@ -38,6 +38,7 @@ public class Layout2Lua extends DocumentTracer {
 		printLua("local Fonts = redditisfun.Fonts");
 		printLua("local Spans = redditisfun.Spans");
 		printLua("local Toasts = redditisfun.Toasts");
+		printLua("local SaveImage = redditisfun.SaveImage");
 		printLua("");
 		
 		printLua("---");
