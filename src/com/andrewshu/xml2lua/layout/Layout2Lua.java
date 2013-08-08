@@ -574,6 +574,12 @@ public class Layout2Lua extends DocumentTracer {
 		if (scaleType != null)
 			printLua(String.format(Locale.ENGLISH, "%s:setScaleType(\"%s\")", viewName, scaleType));
 		
+		// ImageView: adjustViewBounds
+		String adjustViewBounds = attributes.getValue("android:adjustViewBounds");
+		printFixmeIfNeededLua(adjustViewBounds);
+		if (adjustViewBounds != null)
+			printLua(String.format(Locale.ENGLISH, "%s:setAdjustViewBounds(\"%s\")", viewName, adjustViewBounds));
+		
 		// printLua(String.format(Locale.ENGLISH, "%s:set???(\"%s\")", viewName, ???));
 	}
 	
